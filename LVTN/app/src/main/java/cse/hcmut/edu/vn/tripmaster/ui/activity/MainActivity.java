@@ -20,7 +20,7 @@ import cse.hcmut.edu.vn.tripmaster.ui.widget.ViewPagerAdapter;
 
 import static android.graphics.Color.parseColor;
 
-public class MainActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener {
+public class MainActivity extends AppCompatActivity {
 
     private Toolbar toolbar;
     private FloatingActionButton fab;
@@ -105,24 +105,5 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-    }
-
-    @Override
-    public void onPageSelected(int position) {
-        if (position == VALID_POSITION) {
-            fab.setVisibility(View.GONE);
-        } else {
-            fab.setVisibility(View.VISIBLE);
-        }
-    }
-
-    @Override
-    public void onPageScrollStateChanged(int state) {
-
     }
 }

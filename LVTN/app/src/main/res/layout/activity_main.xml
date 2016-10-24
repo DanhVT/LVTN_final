@@ -17,7 +17,6 @@
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="10dp"
         android:theme="@style/AppTheme.AppBarOverlay">
 
         <android.support.v7.widget.Toolbar
@@ -32,6 +31,7 @@
             android:id="@+id/tabs"
             android:layout_width="match_parent"
             app:tabGravity="fill"
+            android:background="@color/colorPrimaryDark"
             android:layout_height="wrap_content" />
     </android.support.design.widget.AppBarLayout>
 
