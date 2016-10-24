@@ -69,17 +69,17 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.getTabAt(2).setIcon(tabIcons[2]);
         tabLayout.getTabAt(3).setIcon(tabIcons[3]);
 
-        tabLayout.getTabAt(0).getIcon().setColorFilter(parseColor("#FFFFFF"), PorterDuff.Mode.SRC_IN);
+        tabLayout.getTabAt(0).getIcon().setColorFilter(parseColor("#000000"), PorterDuff.Mode.SRC_IN);
 
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                tab.getIcon().setColorFilter(parseColor("#FFFFFF"), PorterDuff.Mode.SRC_IN);
+                tab.getIcon().setColorFilter(parseColor("#000000"), PorterDuff.Mode.SRC_IN);
             }
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
-                tab.getIcon().setColorFilter(parseColor("#000000"), PorterDuff.Mode.SRC_IN);
+                tab.getIcon().setColorFilter(parseColor("#c1c1c1"), PorterDuff.Mode.SRC_IN);
             }
 
             @Override

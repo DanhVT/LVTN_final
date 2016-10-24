@@ -31,7 +31,9 @@
             android:id="@+id/tabs"
             android:layout_width="match_parent"
             app:tabGravity="fill"
-            android:background="@color/colorPrimaryDark"
+            app:tabIndicatorColor="@color/colorPrimary"
+            android:background="@color/colorWhite"
+            app:tabIndicatorHeight="4dp"
             android:layout_height="wrap_content" />
     </android.support.design.widget.AppBarLayout>
 
