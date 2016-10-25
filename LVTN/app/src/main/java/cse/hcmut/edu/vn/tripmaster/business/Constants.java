@@ -9,6 +9,9 @@ public class Constants {
     public static final long MIN_TIME_UPDATE_LOCATION = 1000 * 1 * 5; //2s
     public static final float MIN_DISTANCE_UPDATE_LOCATION = 5; //10m
 
+    // InternalConstants for Map view
+    public static final int ZOOM_LVL = 16;
+
     //Status trip
     public static final int TRIP_NEW = 1;
     public static final int TRIP_PENDING = 2;
