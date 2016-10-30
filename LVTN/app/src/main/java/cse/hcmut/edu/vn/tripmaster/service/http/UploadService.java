@@ -5,4 +5,5 @@ package cse.hcmut.edu.vn.tripmaster.service.http;
  */
 
 public class UploadService {
+    
 }
