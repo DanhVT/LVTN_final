@@ -21,6 +21,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -130,6 +131,7 @@ public class MainActivity extends AppCompatActivity {
         private FloatingActionButton fab, fabDuoi, fabTren;
         private Animation Move_Duoi, Move_Tren, Back_Duoi, Back_Tren;
         private  boolean move_back = false;
+        private Button myButton;
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -168,6 +170,15 @@ public class MainActivity extends AppCompatActivity {
             // TODO: FRAGMENT 2 - VIDEOS
             else if(getArguments().getInt(ARG_SECTION_NUMBER) == 2){
                 View rootView = inflater.inflate(R.layout.fragment_videos, container, false);
+                myButton = (Button) rootView.findViewById(R.id.myButton);
+                myButton.setOnClickListener(new View.OnClickListener(){
+
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(getActivity(), VideoPlayer.class);
+                        startActivity(intent);
+                    }
+                });
                 return rootView;
             }
 

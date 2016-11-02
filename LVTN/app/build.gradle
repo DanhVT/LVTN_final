@@ -16,6 +16,7 @@ apply plugin: 'io.fabric'
 
 repositories {
     maven { url 'https://maven.fabric.io/public' }
+    jcenter()
 }
 
 android {
@@ -52,9 +53,9 @@ dependencies {
     compile 'org.osmdroid:osmdroid-android:5.1@aar'
     compile 'com.squareup.okhttp3:okhttp:3.4.1'
     compile 'com.github.MKergall.osmbonuspack:OSMBonusPack:v5.7'
-    compile 'com.devbrackets.android:exomedia:3.0.5'
-    compile 'com.devbrackets.android:playlistcore:1.1.1'
-    compile 'com.squareup.leakcanary:leakcanary-android:1.4-beta2'
+
+    compile 'com.google.android.exoplayer:exoplayer:r1.5.8'
+
     compile 'com.github.satyan:sugar:1.5'
     compile 'com.google.android.gms:play-services:9.4.0'
     testCompile 'junit:junit:4.12'

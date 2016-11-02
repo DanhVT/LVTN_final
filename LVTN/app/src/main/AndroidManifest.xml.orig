@@ -8,6 +8,9 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission  android:name="android.permission.WAKE_LOCK"  />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS"></uses-permission>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.GPS_PROVIDER" />
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -32,7 +35,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity android:name=".ui.activity.RowTrip" />
         <activity android:name=".ui.activity.RowAttributeUser" />
         <activity android:name=".ui.activity.InformationUser" />
@@ -55,6 +57,7 @@
         <meta-data
             android:name="DOMAIN_PACKAGE_NAME"
             android:value="cse.hcmut.edu.vn.tripmaster" />
+<<<<<<< Updated upstream
 
          <meta-data
          android:name="io.fabric.ApiKey"
@@ -79,6 +82,13 @@
             android:label="@string/title_activity_maps">
         </activity>
 
+=======
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="59da65b734f591a9e856121b6650b98659408ce3" />
+
+        <activity android:name=".ui.activity.VideoPlayer"></activity>
+>>>>>>> Stashed changes
     </application>
 
 </manifest>
