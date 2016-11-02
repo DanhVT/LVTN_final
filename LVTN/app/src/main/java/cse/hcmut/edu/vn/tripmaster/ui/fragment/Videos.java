@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import cse.hcmut.edu.vn.tripmaster.R;
-import cse.hcmut.edu.vn.tripmaster.ui.activity.VideoView;
+import cse.hcmut.edu.vn.tripmaster.ui.activity.VideoPlayer;
 
 
 /**
@@ -72,20 +72,7 @@ public class Videos extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_videos, container, false);
-        button = (Button) view.findViewById(R.id.MyButton);
-
-        // Capture button clicks
-        button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View arg0) {
-
-                // Start NewActivity.class
-                Intent myIntent = new Intent(getActivity(),
-                        VideoView.class);
-                startActivity(myIntent);
-            }
-        });
-        return view;
+        return inflater.inflate(R.layout.fragment_videos, container, false);
     }
 
     // TODO: Rename method, update argument and hook method into UI event

@@ -49,7 +49,7 @@
             android:name="io.fabric.ApiKey"
             android:value="59da65b734f591a9e856121b6650b98659408ce3" />
 
-        <activity android:name=".ui.activity.VideoView"></activity>
+        <activity android:name=".ui.activity.VideoPlayer"></activity>
     </application>
 
 </manifest>
