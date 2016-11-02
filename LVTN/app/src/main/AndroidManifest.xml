@@ -1,13 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="cse.hcmut.edu.vn.tripmaster">
+
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="cse.hcmut.edu.vn.tripmaster.permission.MAPS_RECEIVE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.GPS_PROVIDER" />
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- ĐOẠN CODE DO DŨNG THÊM VÀO -->
+    <permission
+        android:name="cse.hcmut.edu.vn.tripmaster.permission.MAPS_RECEIVE"
+        android:protectionLevel="signature"/>
+    <uses-permission android:name="cse.hcmut.edu.vn.tripmaster.permission.MAPS_RECEIVE" />
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+    <!-- -->
 
     <application
         android:allowBackup="true"
@@ -22,16 +32,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity android:name=".ui.activity.RowTrip" />
         <activity android:name=".ui.activity.RowAttributeUser" />
         <activity android:name=".ui.activity.InformationUser" />
+
         <service
             android:name=".service.internal.TrackingService"
             android:enabled="true"
             android:exported="false" />
 
-        <!--SUGAR ORM DATABASE CONFIGURE-->
+        <!-- SUGAR ORM DATABASE CONFIGURE -->
         <meta-data
             android:name="DATABASE"
             android:value="TripMaster.db" />
@@ -45,9 +55,29 @@
             android:name="DOMAIN_PACKAGE_NAME"
             android:value="cse.hcmut.edu.vn.tripmaster" />
 
+         <meta-data
+         android:name="io.fabric.ApiKey"
+         android:value="59da65b734f591a9e856121b6650b98659408ce3"  />
+        <!--
+             The API key for Google Maps-based APIs is defined as a string resource.
+             (See the file "res/values/google_maps_api.xml").
+             Note that the API key is linked to the encryption key used to sign the APK.
+             You need a different API key for each encryption key, including the release key that is used to
+             sign the APK for publishing.
+             You can define the keys for the debug and release targets in src/debug/ and src/release/. 
+        -->
         <meta-data
-            android:name="io.fabric.ApiKey"
-            android:value="59da65b734f591a9e856121b6650b98659408ce3"  />
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key" />
+
+        <meta-data android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version"/>
+
+        <activity
+            android:name=".ui.activity.MapsActivity"
+            android:label="@string/title_activity_maps">
+        </activity>
+
     </application>
 
 </manifest>

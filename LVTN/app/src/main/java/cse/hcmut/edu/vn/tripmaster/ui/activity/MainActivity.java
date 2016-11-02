@@ -127,8 +127,8 @@ public class MainActivity extends AppCompatActivity {
         private ListView lv1;
         private ImageView imageView;
         private RoundImage roundImage;
-        private FloatingActionButton fab, fabTrai, fabTren;
-        private Animation Move_Trai, Move_Tren, Back_Trai, Back_Tren;
+        private FloatingActionButton fab, fabDuoi, fabTren;
+        private Animation Move_Duoi, Move_Tren, Back_Duoi, Back_Tren;
         private  boolean move_back = false;
 
         @Override
@@ -154,13 +154,13 @@ public class MainActivity extends AppCompatActivity {
                 lv.setAdapter(adapter);
 
                 FloatingActionButton fabAddTrip = (FloatingActionButton) rootView.findViewById(R.id.fab_Trip);
-//                fabAddTrip.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-//                        Intent goTo_Map = new Intent(getActivity(), MapsActivity.class);
-//                        startActivity(goTo_Map);
-//                    }
-//                });
+                fabAddTrip.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent goTo_Map = new Intent(getActivity(), MapsActivity.class);
+                        startActivity(goTo_Map);
+                    }
+                });
 
                 return rootView;
             }
@@ -212,12 +212,12 @@ public class MainActivity extends AppCompatActivity {
 
                 // TODO: Add new Trip_Dung Or An New Video
                 fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
-                fabTrai = (FloatingActionButton) rootView.findViewById(R.id.fab_Trai);
+                fabDuoi = (FloatingActionButton) rootView.findViewById(R.id.fab_Duoi);
                 fabTren = (FloatingActionButton) rootView.findViewById(R.id.fab_Tren);
 
-                Move_Trai = AnimationUtils.loadAnimation(getActivity(), R.anim.move_trai);
+                Move_Duoi = AnimationUtils.loadAnimation(getActivity(), R.anim.move_duoi);
                 Move_Tren = AnimationUtils.loadAnimation(getActivity(), R.anim.move_tren);
-                Back_Trai = AnimationUtils.loadAnimation(getActivity(), R.anim.back_trai);
+                Back_Duoi = AnimationUtils.loadAnimation(getActivity(), R.anim.back_duoi);
                 Back_Tren = AnimationUtils.loadAnimation(getActivity(), R.anim.back_tren);
 
                 fab.setOnClickListener(new View.OnClickListener() {
@@ -234,7 +234,7 @@ public class MainActivity extends AppCompatActivity {
 
                     }
                 });
-                fabTrai.setOnClickListener(new View.OnClickListener() {
+                fabDuoi.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
 
@@ -254,10 +254,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         private void Move(){
-            FrameLayout.LayoutParams paramsTrai = (FrameLayout.LayoutParams) fabTrai.getLayoutParams();
-            paramsTrai.rightMargin = (int)(fabTrai.getWidth() * 1.5);
-            fabTrai.setLayoutParams(paramsTrai);
-            fabTrai.startAnimation(Move_Trai);
+            FrameLayout.LayoutParams paramsTrai = (FrameLayout.LayoutParams) fabDuoi.getLayoutParams();
+            paramsTrai.topMargin = (int)(fabDuoi.getWidth() * 1.5);
+            fabDuoi.setLayoutParams(paramsTrai);
+            fabDuoi.startAnimation(Move_Duoi);
 
             FrameLayout.LayoutParams paramsTren = (FrameLayout.LayoutParams) fabTren.getLayoutParams();
             paramsTren.bottomMargin = (int)(fabTren.getWidth() * 1.5);
@@ -265,10 +265,10 @@ public class MainActivity extends AppCompatActivity {
             fabTren.startAnimation(Move_Tren);
         }
         private void Back(){
-            FrameLayout.LayoutParams paramsTrai = (FrameLayout.LayoutParams) fabTrai.getLayoutParams();
-            paramsTrai.rightMargin -= (int)(fabTrai.getWidth() * 1.5);
-            fabTrai.setLayoutParams(paramsTrai);
-            fabTrai.startAnimation(Back_Trai);
+            FrameLayout.LayoutParams paramsTrai = (FrameLayout.LayoutParams) fabDuoi.getLayoutParams();
+            paramsTrai.topMargin -= (int)(fabDuoi.getWidth() * 1.5);
+            fabDuoi.setLayoutParams(paramsTrai);
+            fabDuoi.startAnimation(Back_Duoi);
 
             FrameLayout.LayoutParams paramsTren = (FrameLayout.LayoutParams) fabTren.getLayoutParams();
             paramsTren.bottomMargin -= (int)(fabTren.getWidth() * 1.5);
