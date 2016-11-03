@@ -126,6 +126,7 @@ public class MainActivity extends AppCompatActivity {
 
         private ListView lv;
         private ListView lv1;
+        private  ListView lvVideo;
         private ImageView imageView;
         private RoundImage roundImage;
         private FloatingActionButton fab, fabDuoi, fabTren;
@@ -170,15 +171,23 @@ public class MainActivity extends AppCompatActivity {
             // TODO: FRAGMENT 2 - VIDEOS
             else if(getArguments().getInt(ARG_SECTION_NUMBER) == 2){
                 View rootView = inflater.inflate(R.layout.fragment_videos, container, false);
-                myButton = (Button) rootView.findViewById(R.id.myButton);
-                myButton.setOnClickListener(new View.OnClickListener(){
 
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(getActivity(), VideoPlayer.class);
-                        startActivity(intent);
-                    }
-                });
+                lvVideo = (ListView) rootView.findViewById(R.id.listViewVideo);
+
+                ArrayList<VideoObject> listVideo = new ArrayList<VideoObject>();
+                listVideo.add(new VideoObject("Vũng Tàu - bãi Biển mơ mộng", "Hoàng Dũng", "10/23/2016", 100));
+                listVideo.add(new VideoObject("Đà lạt", "Thanh Danh", "10/23/2016", 10));
+                listVideo.add(new VideoObject("Nha Trang", "Anh Đức", "10/23/2016", 54));
+                listVideo.add(new VideoObject("Vịnh Hạ Long", "Bách Khoa", "10/23/2016", 10));
+                listVideo.add(new VideoObject("Đà Nẵng - Quảng Nam", "LVTN", "10/23/2016", 10));
+//
+                ListAdapterVideo adapter = new ListAdapterVideo(
+                        this.getActivity(),
+                        R.layout.activity_row_video,
+                        listVideo
+                );
+                lvVideo.setAdapter(adapter);
+
                 return rootView;
             }
 

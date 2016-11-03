@@ -14,11 +14,12 @@
     <!-- ĐOẠN CODE DO DŨNG THÊM VÀO -->
     <permission
         android:name="cse.hcmut.edu.vn.tripmaster.permission.MAPS_RECEIVE"
-        android:protectionLevel="signature"/>
+        android:protectionLevel="signature" />
+
     <uses-permission android:name="cse.hcmut.edu.vn.tripmaster.permission.MAPS_RECEIVE" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
-    <!-- -->
 
+    <!--  -->
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -32,7 +33,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity android:name=".ui.activity.RowTrip" />
         <activity android:name=".ui.activity.RowAttributeUser" />
         <activity android:name=".ui.activity.InformationUser" />
@@ -55,10 +55,9 @@
         <meta-data
             android:name="DOMAIN_PACKAGE_NAME"
             android:value="cse.hcmut.edu.vn.tripmaster" />
-
-         <meta-data
-         android:name="io.fabric.ApiKey"
-         android:value="59da65b734f591a9e856121b6650b98659408ce3"  />
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="59da65b734f591a9e856121b6650b98659408ce3" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -70,15 +69,14 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
-
-        <meta-data android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version"/>
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
 
         <activity
             android:name=".ui.activity.MapsActivity"
-            android:label="@string/title_activity_maps">
-        </activity>
-
+            android:label="@string/title_activity_maps"></activity>
+        <activity android:name=".ui.activity.RowVideo"></activity>
     </application>
 
 </manifest>
