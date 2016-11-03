@@ -1,8 +1,12 @@
 package cse.hcmut.edu.vn.tripmaster.service.http;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -29,12 +33,20 @@ public class ServerRequest {
         return response.body().string();
     }
 
-    private String post(String url, String json) throws IOException {
+    private String post(String url, String json) throws IOException, JSONException {
         OkHttpClient client = new OkHttpClient();
-        RequestBody body = RequestBody.create(JSON, json);
+
+        RequestBody requestBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM).build();
+
+        JSONObject jsonObject = new JSONObject(json);
+
+        
+
+//        RequestBody body = RequestBody.create(JSON, json);
         Request request = new Request.Builder()
                 .url(url)
-                .post(body)
+                .post(requestBody)
                 .build();
         Response response = client.newCall(request).execute();
         return response.body().string();
