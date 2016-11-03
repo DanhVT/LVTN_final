@@ -36,7 +36,7 @@
         <activity android:name=".ui.activity.RowTrip" />
         <activity android:name=".ui.activity.RowAttributeUser" />
         <activity android:name=".ui.activity.InformationUser" />
-
+        <activity android:name=".ui.activity.VideoPlayer"></activity>
         <service
             android:name=".service.internal.TrackingService"
             android:enabled="true"

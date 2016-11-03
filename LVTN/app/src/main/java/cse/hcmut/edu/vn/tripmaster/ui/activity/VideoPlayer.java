@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -52,6 +53,7 @@ public class VideoPlayer extends Activity {
     private ImageButton btnPrev;
     private ImageButton btnRew;
     private ImageButton btnNext;
+    private RelativeLayout loadingPanel;
     private int RENDERER_COUNT = 300000;
     private int minBufferMs =    250000;
 
@@ -65,7 +67,7 @@ public class VideoPlayer extends Activity {
     private StringBuilder mFormatBuilder;
     private Formatter mFormatter;
     private String HLSurl = "http://walterebert.com/playground/video/hls/sintel-trailer.m3u8";
-    private String mp4URL = "http://www.sample-videos.com/video/mp4/480/big_buck_bunny_480p_5mb.mp4";
+    private String mp4URL = "http://player.hungama.com/mp3/91508493.mp4";
     private String userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:40.0) Gecko/20100101 Firefox/40.0";
 
 
@@ -74,6 +76,10 @@ public class VideoPlayer extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_player);
         surfaceView = (SurfaceView) findViewById(R.id.sv_player);
+        btnPlay = (ImageButton) findViewById(R.id.btnPlay);
+        btnPause = (ImageButton) findViewById(R.id.btn_pause);
+        loadingPanel = (RelativeLayout) findViewById(R.id.loadingVPanel);
+
         mediaController = (LinearLayout) findViewById(R.id.lin_media_controller);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -85,7 +91,11 @@ public class VideoPlayer extends Activity {
             if(exoPlayer!=null){
                 exoPlayer.setPlayWhenReady(true);
                 bIsPlaying=true;
+//                loadingPanel.setVisibility(View.VISIBLE);
                 setProgress();
+
+                btnPlay.setVisibility(View.GONE);
+                btnPause.setVisibility(View.VISIBLE);
             }
 
         }
@@ -204,6 +214,26 @@ public class VideoPlayer extends Activity {
                     txtCurrentTime.setText(stringForTime((int)exoPlayer.getCurrentPosition()));
                     txtEndTime.setText(stringForTime((int)exoPlayer.getDuration()));
 
+                    switch (exoPlayer.getPlaybackState()) {
+                        case ExoPlayer.STATE_BUFFERING:
+                            loadingPanel.setVisibility(View.VISIBLE);
+                            break;
+                        case ExoPlayer.STATE_ENDED:
+                            finish();
+                            break;
+                        case ExoPlayer.STATE_IDLE:
+                            loadingPanel.setVisibility(View.GONE);
+                            break;
+                        case ExoPlayer.STATE_PREPARING:
+                            loadingPanel.setVisibility(View.VISIBLE);
+                            break;
+                        case ExoPlayer.STATE_READY:
+                            loadingPanel.setVisibility(View.GONE);
+                            break;
+                        default:
+                            break;
+                    }
+
                     handler.postDelayed(this, 1000);
                 }
 
@@ -270,8 +300,6 @@ public class VideoPlayer extends Activity {
     }
 
     private void initPlayButton() {
-        btnPlay = (ImageButton) findViewById(R.id.btnPlay);
-        btnPause = (ImageButton) findViewById(R.id.btn_pause);
 
         btnPlay.requestFocus();
         btnPlay.setOnClickListener(new View.OnClickListener() {
@@ -367,5 +395,15 @@ public class VideoPlayer extends Activity {
 
             }
         });
+    }
+    private void killPlayer(){
+        if (exoPlayer != null) {
+            exoPlayer.release();
+        }
+    }
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        killPlayer();
     }
 }
