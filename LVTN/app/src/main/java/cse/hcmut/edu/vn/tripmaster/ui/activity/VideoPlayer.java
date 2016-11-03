@@ -1,174 +1,232 @@
 package cse.hcmut.edu.vn.tripmaster.ui.activity;
 
-import android.content.Intent;
+import android.app.Activity;
+import android.media.MediaCodec;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.PopupMenu;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.google.android.exoplayer.DummyTrackRenderer;
+import com.google.android.exoplayer.DefaultLoadControl;
 import com.google.android.exoplayer.ExoPlayer;
+import com.google.android.exoplayer.LoadControl;
+import com.google.android.exoplayer.MediaCodecAudioTrackRenderer;
+import com.google.android.exoplayer.MediaCodecSelector;
 import com.google.android.exoplayer.MediaCodecVideoTrackRenderer;
-import com.google.android.exoplayer.MediaFormat;
-import com.google.android.exoplayer.TrackRenderer;
-import com.google.android.exoplayer.upstream.BandwidthMeter;
-import com.google.android.exoplayer.util.MimeTypes;
-import com.google.android.exoplayer.util.PlayerControl;
-import com.google.android.exoplayer.util.Util;
+import com.google.android.exoplayer.extractor.ExtractorSampleSource;
+import com.google.android.exoplayer.hls.DefaultHlsTrackSelector;
+import com.google.android.exoplayer.hls.HlsChunkSource;
+import com.google.android.exoplayer.hls.HlsPlaylist;
+import com.google.android.exoplayer.hls.HlsPlaylistParser;
+import com.google.android.exoplayer.hls.HlsSampleSource;
+import com.google.android.exoplayer.hls.PtsTimestampAdjusterProvider;
+import com.google.android.exoplayer.upstream.Allocator;
+import com.google.android.exoplayer.upstream.DataSource;
+import com.google.android.exoplayer.upstream.DefaultAllocator;
+import com.google.android.exoplayer.upstream.DefaultBandwidthMeter;
+import com.google.android.exoplayer.upstream.DefaultUriDataSource;
+import com.google.android.exoplayer.util.ManifestFetcher;
 
-import java.util.concurrent.TimeUnit;
+import java.io.IOException;
+import java.util.Formatter;
+import java.util.Locale;
 
 import cse.hcmut.edu.vn.tripmaster.R;
-import cse.hcmut.edu.vn.tripmaster.ui.widget.HpLib_RendererBuilder;
 
-public class VideoPlayer extends AppCompatActivity implements View.OnClickListener {
+public class VideoPlayer extends Activity {
+
+    private SurfaceView surfaceView;
     private ExoPlayer exoPlayer;
-    private SurfaceView surface;
+    private boolean bAutoplay=true;
+    private boolean bIsPlaying=false;
+    private boolean bControlsActive=true;
+    private ImageButton btnPlay;
+    private ImageButton btnPause;
+    private ImageButton btnFwd;
+    private ImageButton btnPrev;
+    private ImageButton btnRew;
+    private ImageButton btnNext;
+    private int RENDERER_COUNT = 300000;
     private int minBufferMs =    250000;
+
     private final int BUFFER_SEGMENT_SIZE = 64 * 1024;
     private final int BUFFER_SEGMENT_COUNT = 256;
-    public static final int TYPE_VIDEO = 0;
-    public static final int RENDERER_COUNT = 2;
-    public static final int TYPE_AUDIO = 1;
-    private RelativeLayout loadingPanel;
-    private Handler mainHandler;
-    private Runnable updatePlayer,hideControls;
-    private HpLib_RendererBuilder hpLibRendererBuilder;
-    private PlaybackState mPlaybackState;
+    private LinearLayout mediaController;
+    private SeekBar seekPlayerProgress;
+    private Handler handler;
+    private TextView txtCurrentTime;
+    private TextView txtEndTime;
+    private StringBuilder mFormatBuilder;
+    private Formatter mFormatter;
+    private String HLSurl = "http://walterebert.com/playground/video/hls/sintel-trailer.m3u8";
+    private String mp4URL = "http://www.sample-videos.com/video/mp4/480/big_buck_bunny_480p_5mb.mp4";
+    private String userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:40.0) Gecko/20100101 Firefox/40.0";
 
-    private TrackRenderer videoRenderer;
-    private LinearLayout root,top_controls, middle_panel, unlock_panel, bottom_controls;
-    private int currentTrackIndex;
-    private String[] video_url, video_type, video_title;
-
-    //Implementing the top bar
-    private ImageButton btn_back;
-    private TextView txt_title;
-
-    private TextView txt_ct,txt_td;
-    private SeekBar seekBar;
-    private PlayerControl playerControl;
-    private ImageButton btn_play;
-    private ImageButton btn_pause;
-    private ImageButton btn_fwd;
-    private ImageButton btn_rev;
-    private ImageButton btn_next;
-    private ImageButton btn_prev;
-
-    private ImageButton btn_lock;
-    private ImageButton btn_unlock;
-    private ImageButton btn_settings;
 
     @Override
-    public void onClick(View v) {
-        int i1 = v.getId();
-        if (i1 == R.id.btn_back) {
-            killPlayer();
-            finish();
-        }
-        if (i1 == R.id.btn_pause) {
-            if (playerControl.isPlaying()) {
-                playerControl.pause();
-                btn_pause.setVisibility(View.GONE);
-                btn_play.setVisibility(View.VISIBLE);
-            }
-        }
-        if (i1 == R.id.btn_play) {
-            if (!playerControl.isPlaying()) {
-                playerControl.start();
-                btn_pause.setVisibility(View.VISIBLE);
-                btn_play.setVisibility(View.GONE);
-            }
-        }
-        if (i1 == R.id.btn_fwd) {
-            exoPlayer.seekTo(exoPlayer.getCurrentPosition() + 30000);
-        }
-        if (i1 == R.id.btn_rev) {
-            exoPlayer.seekTo(exoPlayer.getCurrentPosition() - 30000);
-        }
-        if (i1 == R.id.btn_next) {
-            exoPlayer.release();
-            currentTrackIndex++;
-            execute();
-        }
-        if (i1 == R.id.btn_prev) {
-            exoPlayer.release();
-            currentTrackIndex--;
-            execute();
-        }
-        if (i1 == R.id.btn_lock) {
-            controlsState = ControlsMode.LOCK;
-            root.setVisibility(View.GONE);
-            unlock_panel.setVisibility(View.VISIBLE);
-        }
-        if (i1 == R.id.btn_unlock) {
-            controlsState = ControlsMode.FULLCONTORLS;
-            root.setVisibility(View.VISIBLE);
-            unlock_panel.setVisibility(View.GONE);
-        }
-        if (i1 == R.id.btn_settings) {
-            PopupMenu popup = new PopupMenu(VideoPlayer.this, v);
-            popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    exoPlayer.setSelectedTrack(0, (item.getItemId() - 1));
-                    return false;
-                }
-            });
-            Menu menu = popup.getMenu();
-            menu.add(Menu.NONE, 0, 0, "Video Quality");
-            for (int i = 0; i < exoPlayer.getTrackCount(0); i++) {
-                MediaFormat format = exoPlayer.getTrackFormat(0, i);
-                if (MimeTypes.isVideo(format.mimeType)) {
-                    if (format.adaptive) {
-                        menu.add(1, (i + 1), (i + 1), "Auto");
-                    } else {
-                        menu.add(1, (i + 1), (i + 1), format.width + "p");
-                    }
-                }
-            }
-            menu.setGroupCheckable(1, true, true);
-            menu.findItem((exoPlayer.getSelectedTrack(0) + 1)).setChecked(true);
-            popup.show();
-        }
-    }
-
-
-    public enum PlaybackState {
-        PLAYING, PAUSED, BUFFERING, IDLE
-    }
-    public enum ControlsMode {
-        LOCK, FULLCONTORLS
-    }
-    private ControlsMode controlsState;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState)  {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_video_view);
+        setContentView(R.layout.activity_video_player);
+        surfaceView = (SurfaceView) findViewById(R.id.sv_player);
+        mediaController = (LinearLayout) findViewById(R.id.lin_media_controller);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+         initPlayer(0);
+//        initHLSPlayer(0);
 
 
-        initView();
+        if(bAutoplay){
+            if(exoPlayer!=null){
+                exoPlayer.setPlayWhenReady(true);
+                bIsPlaying=true;
+                setProgress();
+            }
+
+        }
+
     }
-    private void initView(){
-        loadingPanel = (RelativeLayout) findViewById(R.id.loadingVPanel);
-        txt_ct = (TextView) findViewById(R.id.txt_currentTime);
-        txt_td = (TextView) findViewById(R.id.txt_totalDuration);
-        seekBar = (SeekBar) findViewById(R.id.seekbar);
-        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+
+    private void initMediaControls() {
+        initSurfaceView();
+        initPlayButton();
+        initSeekBar();
+        initTxtTime();
+        initFwd();
+        initPrev();
+        initRew();
+        initNext();
+
+    }
+
+    private void initNext() {
+        btnNext = (ImageButton) findViewById(R.id.next);
+        btnNext.requestFocus();
+        btnNext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                exoPlayer.seekTo(exoPlayer.getDuration());
+            }
+        });
+    }
+
+    private void initRew() {
+        btnRew = (ImageButton) findViewById(R.id.rew);
+        btnRew.requestFocus();
+        btnRew.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                exoPlayer.seekTo(exoPlayer.getCurrentPosition()-10000);
+            }
+        });
+    }
+
+    private void initPrev() {
+        btnPrev = (ImageButton) findViewById(R.id.prev);
+        btnPrev.requestFocus();
+        btnPrev.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                exoPlayer.seekTo(0);
+            }
+        });
+
+
+    }
+
+
+    private void initFwd() {
+        btnFwd = (ImageButton) findViewById(R.id.ffwd);
+        btnFwd.requestFocus();
+        btnFwd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                exoPlayer.seekTo(exoPlayer.getCurrentPosition()+10000);
+            }
+        });
+
+
+    }
+
+    private void initTxtTime() {
+        txtCurrentTime = (TextView) findViewById(R.id.time_current);
+        txtEndTime = (TextView) findViewById(R.id.player_end_time);
+    }
+
+    private void initSurfaceView() {
+        surfaceView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                toggleMediaControls();
+            }
+        });
+    }
+
+    private String stringForTime(int timeMs) {
+        mFormatBuilder = new StringBuilder();
+        mFormatter = new Formatter(mFormatBuilder, Locale.getDefault());
+        int totalSeconds =  timeMs / 1000;
+
+        int seconds = totalSeconds % 60;
+        int minutes = (totalSeconds / 60) % 60;
+        int hours   = totalSeconds / 3600;
+
+        mFormatBuilder.setLength(0);
+        if (hours > 0) {
+            return mFormatter.format("%d:%02d:%02d", hours, minutes, seconds).toString();
+        } else {
+            return mFormatter.format("%02d:%02d", minutes, seconds).toString();
+        }
+    }
+
+    private void setProgress() {
+        seekPlayerProgress.setProgress(0);
+        seekPlayerProgress.setMax(0);
+        seekPlayerProgress.setMax((int) exoPlayer.getDuration()/1000);
+
+
+        handler = new Handler();
+        //Make sure you update Seekbar on UI thread
+        handler.post(new Runnable() {
+
+            @Override
+            public void run() {
+                if (exoPlayer != null && bIsPlaying ) {
+                    seekPlayerProgress.setMax(0);
+                    seekPlayerProgress.setMax((int) exoPlayer.getDuration()/1000);
+                    int mCurrentPosition = (int) exoPlayer.getCurrentPosition() / 1000;
+                    seekPlayerProgress.setProgress(mCurrentPosition);
+                    txtCurrentTime.setText(stringForTime((int)exoPlayer.getCurrentPosition()));
+                    txtEndTime.setText(stringForTime((int)exoPlayer.getDuration()));
+
+                    handler.postDelayed(this, 1000);
+                }
+
+            }
+        });
+
+
+    }
+
+    private void initSeekBar() {
+        seekPlayerProgress = (SeekBar) findViewById(R.id.mediacontroller_progress);
+        seekPlayerProgress.requestFocus();
+
+        seekPlayerProgress.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (!fromUser) {
+                    // We're not interested in programmatically generated changes to
+                    // the progress bar's position.
+                    return;
+                }
 
+                exoPlayer.seekTo(progress*1000);
             }
 
             @Override
@@ -178,174 +236,136 @@ public class VideoPlayer extends AppCompatActivity implements View.OnClickListen
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                exoPlayer.seekTo(seekBar.getProgress());
+
             }
         });
 
-        btn_back = (ImageButton) findViewById(R.id.btn_back);
-        btn_play = (ImageButton) findViewById(R.id.btn_play);
-        btn_pause = (ImageButton) findViewById(R.id.btn_pause);
-        btn_fwd = (ImageButton) findViewById(R.id.btn_fwd);
-        btn_rev = (ImageButton) findViewById(R.id.btn_rev);
-        btn_prev = (ImageButton) findViewById(R.id.btn_prev);
-        btn_next = (ImageButton) findViewById(R.id.btn_next);
+        seekPlayerProgress.setMax(0);
+        seekPlayerProgress.setMax((int) exoPlayer.getDuration()/1000);
 
-        btn_lock = (ImageButton) findViewById(R.id.btn_lock);
-        btn_unlock = (ImageButton) findViewById(R.id.btn_unlock);
-        btn_settings = (ImageButton) findViewById(R.id.btn_settings);
-
-        btn_back.setOnClickListener(this);
-        btn_play.setOnClickListener(this);
-        btn_pause.setOnClickListener(this);
-        btn_fwd.setOnClickListener(this);
-        btn_rev.setOnClickListener(this);
-        btn_prev.setOnClickListener(this);
-        btn_next.setOnClickListener(this);
-
-        btn_lock.setOnClickListener(this);
-        btn_unlock.setOnClickListener(this);
-        btn_settings.setOnClickListener(this);
-
-        unlock_panel = (LinearLayout) findViewById(R.id.unlock_panel);
-
-        txt_title = (TextView) findViewById(R.id.txt_title);
-
-        currentTrackIndex=0;
-
-        root = (LinearLayout) findViewById(R.id.root);
-        root.setVisibility(View.VISIBLE);
-        surface= (SurfaceView) findViewById(R.id.surface_view);
-
-        video_url = new String[]{"http://playertest.longtailvideo.com/adaptive/bbbfull/bbbfull.m3u8","http://player.hungama.com/mp3/91508493.mp4"};
-        video_title = new String[]{"Big Buck Bunny","Movie Trailer"};
-
-        txt_title.setText(video_title[currentTrackIndex]);
-
-        mainHandler = new Handler();
-
-
-
-        execute();
     }
-    private void execute() {
-        exoPlayer=ExoPlayer.Factory.newInstance(RENDERER_COUNT);
-        playerControl = new PlayerControl(exoPlayer);
-        if(currentTrackIndex>=video_title.length){
-            currentTrackIndex=(video_title.length-1);
-        }else if(currentTrackIndex<=0){
-            currentTrackIndex=0;
-        }
-        txt_title.setText(video_title[currentTrackIndex]);
-        if(exoPlayer!=null) {
-            hpLibRendererBuilder = getHpLibRendererBuilder();
-            hpLibRendererBuilder.buildRenderers(this);
-            loadingPanel.setVisibility(View.VISIBLE);
-            mainHandler.postDelayed(updatePlayer, 200);
-            mainHandler.postDelayed(hideControls, 3000);
-            controlsState = ControlsMode.FULLCONTORLS;
+
+
+    private void toggleMediaControls() {
+
+        if(bControlsActive){
+            hideMediaController();
+            bControlsActive=false;
+
+        }else{
+            showController();
+            bControlsActive=true;
+            setProgress();
         }
     }
 
-    private HpLib_RendererBuilder getHpLibRendererBuilder() {
-        String userAgent = Util.getUserAgent(this, "HpLib");
-        return new HpLib_ExtractorHpLibRendererBuilder(this,userAgent, Uri.parse(video_url[currentTrackIndex]));
-
+    private void showController() {
+        mediaController.setVisibility(View.VISIBLE);
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
     }
 
-    private void pushSurface(boolean blockForSurfacePush) {
-        if (videoRenderer == null) {return;}
-        if (blockForSurfacePush) {
-            exoPlayer.blockingSendMessage(
-                    videoRenderer, MediaCodecVideoTrackRenderer.MSG_SET_SURFACE, surface.getHolder().getSurface());
-        } else {
-            exoPlayer.sendMessage(
-                    videoRenderer, MediaCodecVideoTrackRenderer.MSG_SET_SURFACE, surface.getHolder().getSurface());
-        }
+    private void hideMediaController() {
+        mediaController.setVisibility(View.GONE);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
     }
 
-    void onRenderers(TrackRenderer[] renderers, BandwidthMeter bandwidthMeter) {
-        for (int i = 0; i < renderers.length; i++) {
-            if (renderers[i] == null) {
-                renderers[i] = new DummyTrackRenderer();
-            }
-        }
-        // Complete preparation.
-        this.videoRenderer = renderers[TYPE_VIDEO];
-        pushSurface(false);
-        exoPlayer.prepare(renderers);
-        exoPlayer.setPlayWhenReady(true);
-    }
+    private void initPlayButton() {
+        btnPlay = (ImageButton) findViewById(R.id.btnPlay);
+        btnPause = (ImageButton) findViewById(R.id.btn_pause);
 
-    void onRenderersError(Exception e) {
-    }
-
-    private void killPlayer(){
-        if (exoPlayer != null) {
-            exoPlayer.release();
-        }
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        killPlayer();
-    }
-    Handler getMainHandler() {
-        return mainHandler;
-    }
-    {
-        updatePlayer = new Runnable() {
+        btnPlay.requestFocus();
+        btnPlay.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void run() {
-                switch (exoPlayer.getPlaybackState()) {
-                    case ExoPlayer.STATE_BUFFERING:
-                        loadingPanel.setVisibility(View.VISIBLE);
-                        break;
-                    case ExoPlayer.STATE_ENDED:
-                        finish();
-                        break;
-                    case ExoPlayer.STATE_IDLE:
-                        loadingPanel.setVisibility(View.GONE);
-                        break;
-                    case ExoPlayer.STATE_PREPARING:
-                        loadingPanel.setVisibility(View.VISIBLE);
-                        break;
-                    case ExoPlayer.STATE_READY:
-                        loadingPanel.setVisibility(View.GONE);
-                        break;
-                    default:
-                        break;
-                }
-
-                String totDur = String.format("%02d.%02d.%02d",
-                        TimeUnit.MILLISECONDS.toHours(exoPlayer.getDuration()),
-                        TimeUnit.MILLISECONDS.toMinutes(exoPlayer.getDuration()) -
-                                TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(exoPlayer.getDuration())), // The change is in this line
-                        TimeUnit.MILLISECONDS.toSeconds(exoPlayer.getDuration()) -
-                                TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(exoPlayer.getDuration())));
-                String curDur = String.format("%02d.%02d.%02d",
-                        TimeUnit.MILLISECONDS.toHours(exoPlayer.getCurrentPosition()),
-                        TimeUnit.MILLISECONDS.toMinutes(exoPlayer.getCurrentPosition()) -
-                                TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(exoPlayer.getCurrentPosition())), // The change is in this line
-                        TimeUnit.MILLISECONDS.toSeconds(exoPlayer.getCurrentPosition()) -
-                                TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(exoPlayer.getCurrentPosition())));
-                txt_ct.setText(curDur);
-                txt_td.setText(totDur);
-                seekBar.setMax((int) exoPlayer.getDuration());
-                seekBar.setProgress((int) exoPlayer.getCurrentPosition());
-
-                mainHandler.postDelayed(updatePlayer, 200);
+            public void onClick(View view) {
+                exoPlayer.setPlayWhenReady(true);
+                bIsPlaying=true;
+                setProgress();
+                btnPlay.setVisibility(View.GONE);
+                btnPause.setVisibility(View.VISIBLE);
             }
-        };
-    }
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//        // check if the request code is same as what is passed  here it is 2
-//        if(requestCode==200){
-//            int currTime = data.getIntExtra("currTime",0);
-//            exoPlayer.seekTo(currTime);
-//        }
-//    }
+        });
 
+        btnPause.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                exoPlayer.setPlayWhenReady(false);
+                bIsPlaying=false;
+
+                btnPause.setVisibility(View.GONE);
+                btnPlay.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
+    private void initPlayer(int position) {
+
+
+        Allocator allocator = new DefaultAllocator(minBufferMs);
+        DataSource dataSource = new DefaultUriDataSource(this, null, userAgent);
+
+        ExtractorSampleSource sampleSource = new ExtractorSampleSource( Uri.parse(mp4URL), dataSource, allocator,
+                BUFFER_SEGMENT_COUNT * BUFFER_SEGMENT_SIZE);
+
+        MediaCodecVideoTrackRenderer videoRenderer = new
+                MediaCodecVideoTrackRenderer(this, sampleSource, MediaCodecSelector.DEFAULT,
+                MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT);
+
+        MediaCodecAudioTrackRenderer audioRenderer = new MediaCodecAudioTrackRenderer(sampleSource, MediaCodecSelector.DEFAULT);
+
+        exoPlayer = ExoPlayer.Factory.newInstance(RENDERER_COUNT);
+        exoPlayer.prepare(videoRenderer, audioRenderer);
+        exoPlayer.sendMessage(videoRenderer,
+                MediaCodecVideoTrackRenderer.MSG_SET_SURFACE,
+                surfaceView.getHolder().getSurface());
+        exoPlayer.seekTo(position);
+        initMediaControls();
+
+    }
+
+    private void initHLSPlayer(int position) {
+        Handler mHandler= new Handler();
+        final ManifestFetcher<HlsPlaylist> playlistFetcher;
+        HlsPlaylistParser parser = new HlsPlaylistParser();
+        playlistFetcher = new ManifestFetcher<>(HLSurl,
+                new DefaultUriDataSource(this, userAgent), parser);
+
+
+        playlistFetcher.singleLoad(mHandler.getLooper(), new ManifestFetcher.ManifestCallback<HlsPlaylist>() {
+
+
+            @Override
+            public void onSingleManifest(HlsPlaylist manifest) {
+
+                LoadControl loadControl = new DefaultLoadControl(new DefaultAllocator(BUFFER_SEGMENT_SIZE));
+                DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
+                PtsTimestampAdjusterProvider timestampAdjusterProvider = new PtsTimestampAdjusterProvider();
+                DataSource dataSource = new DefaultUriDataSource(VideoPlayer.this, bandwidthMeter, userAgent);
+                HlsChunkSource chunkSource = new HlsChunkSource(true , dataSource, HLSurl, playlistFetcher.getManifest(),
+                        DefaultHlsTrackSelector.newDefaultInstance(VideoPlayer.this), bandwidthMeter, timestampAdjusterProvider,
+                        HlsChunkSource.ADAPTIVE_MODE_SPLICE);
+                HlsSampleSource sampleSource = new HlsSampleSource(chunkSource, loadControl,
+                        BUFFER_SEGMENT_COUNT * BUFFER_SEGMENT_SIZE);
+                MediaCodecVideoTrackRenderer videoRenderer = new MediaCodecVideoTrackRenderer(VideoPlayer.this, sampleSource,
+                        MediaCodecSelector.DEFAULT, MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT);
+                MediaCodecAudioTrackRenderer audioRenderer = new MediaCodecAudioTrackRenderer(sampleSource,
+                        MediaCodecSelector.DEFAULT);
+
+                exoPlayer = ExoPlayer.Factory.newInstance(RENDERER_COUNT);
+                exoPlayer.prepare(videoRenderer, audioRenderer);
+                exoPlayer.sendMessage(videoRenderer,
+                        MediaCodecVideoTrackRenderer.MSG_SET_SURFACE,
+                        surfaceView.getHolder().getSurface());
+                exoPlayer.seekTo(0);
+
+                initMediaControls();
+
+
+            }
+
+            @Override
+            public void onSingleManifestError(IOException e) {
+
+            }
+        });
+    }
 }
