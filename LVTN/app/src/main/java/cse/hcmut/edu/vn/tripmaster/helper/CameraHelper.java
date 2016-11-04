@@ -17,12 +17,7 @@ import java.util.Date;
  * Created by danh-vo on 03/11/2016.
  */
 
-public class CameraHelper extends Activity{
-    final int TAKE_CAMERA_PIC_CODE = 100;
-    final int TAKE_CAMERA_VIDEO_CODE = 101;
-    final int RECORD_AUDIO_CODE = 102;
-    private String currentPath = null;
-
+public class CameraHelper {
     public static String getBrand() {
         String brand;
         try {
@@ -47,31 +42,7 @@ public class CameraHelper extends Activity{
 
         return modelName;
     }
-    public void showCamera() {
-        try {
-            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            File f = createImageFile();
-            currentPath = f.getAbsolutePath();
-            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
-            startActivityForResult(takePictureIntent, TAKE_CAMERA_PIC_CODE);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void showCameraVideo() {
-        try {
-            Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-            File f = createVideoFile();
-            currentPath = f.getAbsolutePath();
-            takeVideoIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
-            startActivityForResult(takeVideoIntent, TAKE_CAMERA_VIDEO_CODE);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public File createImageFile() throws IOException {
+    public static File createImageFile() throws IOException {
         boolean externalStorageAvailable = false;
         boolean externalStorageWriteable = false;
         File root = null;
@@ -103,7 +74,7 @@ public class CameraHelper extends Activity{
         return tempFile;
     }
 
-    public File createVideoFile() throws IOException {
+    public static File createVideoFile() throws IOException {
         boolean externalStorageAvailable = false;
         boolean externalStorageWriteable = false;
         File root = null;
@@ -133,42 +104,5 @@ public class CameraHelper extends Activity{
             e.printStackTrace();
         }
         return tempFile;
-    }
-
-    public void handleCameraPhoto() {
-        //Load picture from sdcard
-        try {
-            File file = new File (currentPath);
-            System.out.println("####### handleSmallCameraPhoto ####### "+file.getAbsolutePath());
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inSampleSize = 2;
-            Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath(),options);
-            System.out.println("####### handleSmallCameraPhoto ####### "+bitmap);
-//            imageTaken.setImageBitmap(bitmap); ===================>>>> se gan len map
-//            new MyTask("image").execute(file); ===================>>>> upload to server
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void handleCameraVideo(Intent intent) {
-        System.out.println("####### handleCameraVideo ####### "+currentPath);
-        File file = new File (currentPath);
-//        new MyTask("video").execute(file); ===================>>>> upload to server
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // TODO Auto-generated method stub
-        super.onActivityResult(requestCode, resultCode, data);
-        if( resultCode == Activity.RESULT_OK) {
-            if(requestCode == TAKE_CAMERA_PIC_CODE) {
-                System.out.println("####### onActivityResult ####### "+data);
-                handleCameraPhoto();
-            } else if(requestCode == TAKE_CAMERA_VIDEO_CODE) {
-                System.out.println("####### onActivityResult ####### "+data);
-                handleCameraVideo(data);
-            }
-        }
     }
 }

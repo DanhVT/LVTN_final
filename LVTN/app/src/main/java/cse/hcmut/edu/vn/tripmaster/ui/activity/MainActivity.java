@@ -1,10 +1,13 @@
 package cse.hcmut.edu.vn.tripmaster.ui.activity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.PorterDuff;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -26,10 +29,12 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import cse.hcmut.edu.vn.tripmaster.R;
 import cse.hcmut.edu.vn.tripmaster.helper.CameraHelper;
+import cse.hcmut.edu.vn.tripmaster.service.http.UploadAsync;
 
 import static android.graphics.Color.parseColor;
 
@@ -135,6 +140,10 @@ public class MainActivity extends AppCompatActivity {
         private  boolean move_back = false;
         private Button myButton;
 
+        private String currentPath = null;
+        final int TAKE_CAMERA_PIC_CODE = 100;
+        final int TAKE_CAMERA_VIDEO_CODE = 101;
+
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             // TODO: FRAGMENT 1 - TRIPS
@@ -188,6 +197,14 @@ public class MainActivity extends AppCompatActivity {
                         listVideo
                 );
                 lvVideo.setAdapter(adapter);
+
+                FloatingActionButton fabAddTrip = (FloatingActionButton) rootView.findViewById(R.id.fabVideo);
+                fabAddTrip.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showCameraVideo();
+                    }
+                });
 
                 return rootView;
             }
@@ -296,6 +313,64 @@ public class MainActivity extends AppCompatActivity {
             fabTren.setLayoutParams(paramsTren);
             fabTren.startAnimation(Back_Tren);
         }
+
+        @Override
+        public void onActivityResult(int requestCode, int resultCode, Intent data) {
+            // TODO Auto-generated method stub
+            super.onActivityResult(requestCode, resultCode, data);
+            if( resultCode == Activity.RESULT_OK) {
+                if(requestCode == TAKE_CAMERA_PIC_CODE) {
+                    System.out.println("####### onActivityResult ####### "+data);
+                    handleCameraPhoto(currentPath);
+                } else if(requestCode == TAKE_CAMERA_VIDEO_CODE) {
+                    System.out.println("####### onActivityResult ####### "+data);
+                    handleCameraVideo(currentPath);
+                }
+            }
+        }
+        public void showCamera() {
+            try {
+                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                File f = CameraHelper.createImageFile();
+                currentPath = f.getAbsolutePath();
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
+                startActivityForResult(takePictureIntent, TAKE_CAMERA_PIC_CODE);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        public void showCameraVideo() {
+            try {
+                Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+                File f = CameraHelper.createVideoFile();
+                currentPath = f.getAbsolutePath();
+                takeVideoIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
+                startActivityForResult(takeVideoIntent, TAKE_CAMERA_VIDEO_CODE);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        public void handleCameraPhoto(String currentPath) {
+            //Load picture from sdcard
+            try {
+                File file = new File (currentPath);
+                System.out.println("####### handleSmallCameraPhoto ####### "+file.getAbsolutePath());
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inSampleSize = 2;
+                Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath(),options);
+                System.out.println("####### handleSmallCameraPhoto ####### "+bitmap);
+    //            imageTaken.setImageBitmap(bitmap); ===================>>>> se gan len map
+    //            new MyTask("image").execute(file); ===================>>>> upload to server
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        public void handleCameraVideo(String currentPath) {
+            System.out.println("####### handleCameraVideo ####### "+currentPath);
+            File file = new File (currentPath);
+            new UploadAsync("video", getActivity()).execute(file);
+        }
     }
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
@@ -322,5 +397,7 @@ public class MainActivity extends AppCompatActivity {
             return null;
         }
     }
+
+
 
 }
