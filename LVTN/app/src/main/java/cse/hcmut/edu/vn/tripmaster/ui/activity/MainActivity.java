@@ -29,6 +29,7 @@ import android.widget.ListView;
 import java.util.ArrayList;
 
 import cse.hcmut.edu.vn.tripmaster.R;
+import cse.hcmut.edu.vn.tripmaster.helper.CameraHelper;
 
 import static android.graphics.Color.parseColor;
 
@@ -66,20 +67,20 @@ public class MainActivity extends AppCompatActivity {
         };
         for (int i = 0; i < tabLayout.getTabCount(); i++) {
             if(i != 0)
-                tabLayout.getTabAt(i).setIcon(icons[i]).getIcon().setColorFilter(parseColor("#999999"), PorterDuff.Mode.SRC_IN);
+                tabLayout.getTabAt(i).setIcon(icons[i]).getIcon().setColorFilter(parseColor("#9E9E9E"), PorterDuff.Mode.SRC_IN);
             else
-                tabLayout.getTabAt(i).setIcon(icons[i]).getIcon().setColorFilter(parseColor("#008080"), PorterDuff.Mode.SRC_IN);
+                tabLayout.getTabAt(i).setIcon(icons[i]).getIcon().setColorFilter(parseColor("#595959"), PorterDuff.Mode.SRC_IN);
         }
 
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                tab.getIcon().setColorFilter(parseColor("#008080"), PorterDuff.Mode.SRC_IN);
+                tab.getIcon().setColorFilter(parseColor("#595959"), PorterDuff.Mode.SRC_IN);
             }
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
-                tab.getIcon().setColorFilter(parseColor("#999999"), PorterDuff.Mode.SRC_IN);
+                tab.getIcon().setColorFilter(parseColor("#9E9E9E"), PorterDuff.Mode.SRC_IN);
             }
 
             @Override

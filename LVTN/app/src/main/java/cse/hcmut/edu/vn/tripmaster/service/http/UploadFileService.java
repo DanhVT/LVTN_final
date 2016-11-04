@@ -4,13 +4,17 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 
-import com.squareup.okhttp.MultipartBuilder;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.RequestBody;
+import com.android.internal.http.multipart.MultipartEntity;
+
+import org.apache.http.HttpVersion;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.CoreProtocolPNames;
+import org.apache.http.params.HttpParams;
 
 import java.io.File;
-
-import cse.hcmut.edu.vn.tripmaster.ui.activity.MainActivity;
 
 /**
  * Created by danh-vo on 24/10/2016.
@@ -51,6 +55,9 @@ public class UploadFileService extends AsyncTask<File,Void,Void> {
     }
 
     public void uploadFile(String type, File file) {
+        HttpClient httpClient = new DefaultHttpClient();
+//        HttpPost httppost = new HttpPost(uploadurl);
+//        MultipartEntity multipartEntity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
 
     }
 }
