@@ -21,7 +21,6 @@ repositories {
 android {
     compileSdkVersion 24
     buildToolsVersion "24.0.3"
-    useLibrary 'org.apache.http.legacy'
     defaultConfig {
         applicationId "cse.hcmut.edu.vn.tripmaster"
         minSdkVersion 15
@@ -51,7 +50,7 @@ dependencies {
     compile 'com.android.support:design:24.2.1'
     compile 'com.android.support:support-v4:24.2.1'
     compile 'org.osmdroid:osmdroid-android:5.1@aar'
-    compile group: 'org.apache.httpcomponents' , name: 'httpclient-android' , version: '4.3.5.1'
+    compile 'com.squareup.okhttp3:okhttp:3.3.1'
     compile 'com.github.MKergall.osmbonuspack:OSMBonusPack:v5.7'
 
     compile 'com.google.android.exoplayer:exoplayer:r1.5.7'
