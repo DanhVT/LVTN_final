@@ -2,6 +2,7 @@ package cse.hcmut.edu.vn.tripmaster.service.http;
 
 import java.io.File;
 
+import cse.hcmut.edu.vn.tripmaster.helper.BasicHelper;
 import okhttp3.FormBody;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
@@ -49,16 +50,16 @@ public class RequestBuilder {
     }
 
     //Upload request body
-    public static MultipartBody uploadRequestBody(String title, String imageFormat, String token, File file) {
+    public static MultipartBody uploadRequestBody(String title, String imageFormat, String type, File file) {
 
         MediaType MEDIA_TYPE = MediaType.parse("image/" + imageFormat); // e.g. "image/png"
         return new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("action", "upload")
-                .addFormDataPart("format", "json")
-                .addFormDataPart("filename", title + "." + imageFormat) //e.g. title.png --> imageFormat = png
+                .addFormDataPart("type", type)
+                .addFormDataPart("device", BasicHelper.getBrand()+", "+BasicHelper.getModelName())
+                .addFormDataPart("name", title + "." + imageFormat) //e.g. title.png --> imageFormat = png
                 .addFormDataPart("file", "...", RequestBody.create(MEDIA_TYPE, file))
-                .addFormDataPart("token", token)
                 .build();
     }
 }

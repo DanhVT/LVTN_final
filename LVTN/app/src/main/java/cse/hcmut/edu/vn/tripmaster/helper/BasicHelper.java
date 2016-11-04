@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.telephony.TelephonyManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,7 +18,9 @@ import java.util.Date;
  * Created by danh-vo on 03/11/2016.
  */
 
-public class CameraHelper {
+public class BasicHelper {
+    private static TelephonyManager telephonyManager;
+
     public static String getBrand() {
         String brand;
         try {

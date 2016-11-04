@@ -33,8 +33,9 @@ import java.io.File;
 import java.util.ArrayList;
 
 import cse.hcmut.edu.vn.tripmaster.R;
-import cse.hcmut.edu.vn.tripmaster.helper.CameraHelper;
+import cse.hcmut.edu.vn.tripmaster.helper.BasicHelper;
 import cse.hcmut.edu.vn.tripmaster.service.http.UploadAsync;
+import okhttp3.OkHttpClient;
 
 import static android.graphics.Color.parseColor;
 
@@ -43,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
     private ViewPager mViewPager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         // TODO: Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
+
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // TODO: Set up the ViewPager with the sections adapter.
@@ -143,9 +146,11 @@ public class MainActivity extends AppCompatActivity {
         private String currentPath = null;
         final int TAKE_CAMERA_PIC_CODE = 100;
         final int TAKE_CAMERA_VIDEO_CODE = 101;
+        public OkHttpClient client;
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+            client = new OkHttpClient();
             // TODO: FRAGMENT 1 - TRIPS
             if(getArguments().getInt(ARG_SECTION_NUMBER) == 1){
                 View rootView = inflater.inflate(R.layout.fragment_trips, container, false);
@@ -331,7 +336,7 @@ public class MainActivity extends AppCompatActivity {
         public void showCamera() {
             try {
                 Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                File f = CameraHelper.createImageFile();
+                File f = BasicHelper.createImageFile();
                 currentPath = f.getAbsolutePath();
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
                 startActivityForResult(takePictureIntent, TAKE_CAMERA_PIC_CODE);
@@ -342,7 +347,7 @@ public class MainActivity extends AppCompatActivity {
         public void showCameraVideo() {
             try {
                 Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-                File f = CameraHelper.createVideoFile();
+                File f = BasicHelper.createVideoFile();
                 currentPath = f.getAbsolutePath();
                 takeVideoIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
                 startActivityForResult(takeVideoIntent, TAKE_CAMERA_VIDEO_CODE);
@@ -369,7 +374,7 @@ public class MainActivity extends AppCompatActivity {
         public void handleCameraVideo(String currentPath) {
             System.out.println("####### handleCameraVideo ####### "+currentPath);
             File file = new File (currentPath);
-            new UploadAsync("video", getActivity()).execute(file);
+            new UploadAsync(client, "video", getActivity()).execute(file);
         }
     }
 

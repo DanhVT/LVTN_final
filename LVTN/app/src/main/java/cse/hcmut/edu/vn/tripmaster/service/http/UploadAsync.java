@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 
 import cse.hcmut.edu.vn.tripmaster.helper.ApiCall;
+import okhttp3.OkHttpClient;
 
 /**
  * Created by danh-vo on 04/11/2016.
@@ -16,10 +17,12 @@ import cse.hcmut.edu.vn.tripmaster.helper.ApiCall;
 
 public class UploadAsync extends AsyncTask<File,Void,Void> {
     ProgressDialog mProgress;
+    OkHttpClient client;
     String type;
     Context context;
     String url = HttpConstant.UPLOAD_LINK;
-    public UploadAsync(String type, Context context) {
+    public UploadAsync(OkHttpClient client, String type, Context context) {
+        this.client = client;
         this.type = type;
         this.context = context;
     }
@@ -49,7 +52,7 @@ public class UploadAsync extends AsyncTask<File,Void,Void> {
     public void uploadFile(String type, File file)  {
         try {
             String response;
-            response = ApiCall.POST(url, RequestBuilder.uploadRequestBody("title", "png", "someUploadToken", file));
+            response = ApiCall.POST(client, url, RequestBuilder.uploadRequestBody("title", "png", type, file));
             Log.d("Response", response);
         } catch (IOException e) {
             e.printStackTrace();
