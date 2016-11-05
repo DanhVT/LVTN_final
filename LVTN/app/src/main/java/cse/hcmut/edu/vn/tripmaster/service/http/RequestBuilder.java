@@ -1,5 +1,9 @@
 package cse.hcmut.edu.vn.tripmaster.service.http;
 
+import android.telecom.TelecomManager;
+import android.telephony.TelephonyManager;
+import android.util.Log;
+
 import java.io.File;
 
 import cse.hcmut.edu.vn.tripmaster.helper.BasicHelper;
@@ -50,16 +54,17 @@ public class RequestBuilder {
     }
 
     //Upload request body
-    public static MultipartBody uploadRequestBody(String title, String imageFormat, String type, File file) {
+    public static MultipartBody uploadRequestBody(String title, String MIME, String type, File file) {
 
-        MediaType MEDIA_TYPE = MediaType.parse("image/" + imageFormat); // e.g. "image/png"
+        MediaType MEDIA_TYPE = MediaType.parse(MIME);
+        String format = MIME.split("/")[1];
         return new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("action", "upload")
                 .addFormDataPart("type", type)
                 .addFormDataPart("device", BasicHelper.getBrand()+", "+BasicHelper.getModelName())
-                .addFormDataPart("name", title + "." + imageFormat) //e.g. title.png --> imageFormat = png
-                .addFormDataPart("file", "...", RequestBody.create(MEDIA_TYPE, file))
+                .addFormDataPart("name", "Danhvt" ) //e.g. title.png --> imageFormat = png
+                .addFormDataPart("file", title + "." + format, RequestBody.create(MEDIA_TYPE, file))
                 .build();
     }
 }

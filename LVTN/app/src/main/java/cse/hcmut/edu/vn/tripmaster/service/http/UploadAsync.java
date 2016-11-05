@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 
 import cse.hcmut.edu.vn.tripmaster.helper.ApiCall;
+import cse.hcmut.edu.vn.tripmaster.helper.BasicHelper;
 import okhttp3.OkHttpClient;
 
 /**
@@ -18,13 +19,15 @@ import okhttp3.OkHttpClient;
 public class UploadAsync extends AsyncTask<File,Void,Void> {
     ProgressDialog mProgress;
     OkHttpClient client;
-    String type;
+    String type, MIME;
     Context context;
+
     String url = HttpConstant.UPLOAD_LINK;
-    public UploadAsync(OkHttpClient client, String type, Context context) {
+    public UploadAsync(OkHttpClient client, String type, String MIME,Context context) {
         this.client = client;
         this.type = type;
         this.context = context;
+        this.MIME = MIME;
     }
     @Override
     protected void onPreExecute()  {
@@ -51,8 +54,18 @@ public class UploadAsync extends AsyncTask<File,Void,Void> {
     }
     public void uploadFile(String type, File file)  {
         try {
-            String response;
-            response = ApiCall.POST(client, url, RequestBuilder.uploadRequestBody("title", "png", type, file));
+            String response, title;
+            title= BasicHelper.getCurrentTime();
+            if(type=="video"){
+                title = "VID_"+ title;
+            }
+            else if(type=="image"){
+                title = "IMG_"+ title;
+            }
+            else{
+                title = "ORTHER_"+ title;
+            }
+            response = ApiCall.POST(client, url, RequestBuilder.uploadRequestBody(title, MIME, type, file)); //======
             Log.d("Response", response);
         } catch (IOException e) {
             e.printStackTrace();

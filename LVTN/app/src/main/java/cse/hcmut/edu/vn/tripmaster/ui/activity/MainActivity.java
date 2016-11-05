@@ -1,11 +1,13 @@
 package cse.hcmut.edu.vn.tripmaster.ui.activity;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.PorterDuff;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
@@ -16,6 +18,8 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -30,10 +34,14 @@ import android.widget.ImageView;
 import android.widget.ListView;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import cse.hcmut.edu.vn.tripmaster.R;
+import cse.hcmut.edu.vn.tripmaster.helper.ApiCall;
 import cse.hcmut.edu.vn.tripmaster.helper.BasicHelper;
+import cse.hcmut.edu.vn.tripmaster.service.http.HttpConstant;
+import cse.hcmut.edu.vn.tripmaster.service.http.RequestBuilder;
 import cse.hcmut.edu.vn.tripmaster.service.http.UploadAsync;
 import okhttp3.OkHttpClient;
 
@@ -45,7 +53,6 @@ public class MainActivity extends AppCompatActivity {
 
     private ViewPager mViewPager;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,7 +62,6 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         // TODO: Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
-
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // TODO: Set up the ViewPager with the sections adapter.
@@ -292,9 +298,35 @@ public class MainActivity extends AppCompatActivity {
                 View rootView = inflater.inflate(R.layout.fragment_notify, container, false);
 //                TextView textView = (TextView) rootView.findViewById(R.id.section_label);
 //                textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
+                Button btnLogin= (Button) rootView.findViewById(R.id.btnLogin);
+                btnLogin.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        attemptLogin(HttpConstant.HOST_NAME+ "/api/login");
+                    }
+                });
                 return rootView;
             }
         }
+
+        private void attemptLogin(String url) {
+            new AsyncTask<String, Void, Void>() {
+                @Override
+                protected Void doInBackground(String... params) {
+                    try {
+                        String response = ApiCall.POST(
+                                client,
+                                params[0],
+                                RequestBuilder.LoginBody("username", "password", "token"));
+                        Log.d("Response", response);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }
+            }.execute(url);
+        }
+
 
         private void Move(){
             FrameLayout.LayoutParams paramsTrai = (FrameLayout.LayoutParams) fabDuoi.getLayoutParams();
@@ -374,7 +406,7 @@ public class MainActivity extends AppCompatActivity {
         public void handleCameraVideo(String currentPath) {
             System.out.println("####### handleCameraVideo ####### "+currentPath);
             File file = new File (currentPath);
-            new UploadAsync(client, "video", getActivity()).execute(file);
+            new UploadAsync(client, "video", BasicHelper.getMimeType(currentPath), getActivity()).execute(file);
         }
     }
 
