@@ -1,7 +1,6 @@
 package cse.hcmut.edu.vn.tripmaster.helper;
 
 import android.os.Environment;
-import android.telephony.TelephonyManager;
 import android.webkit.MimeTypeMap;
 
 import java.io.File;

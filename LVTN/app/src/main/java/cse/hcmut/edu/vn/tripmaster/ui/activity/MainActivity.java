@@ -209,11 +209,19 @@ public class MainActivity extends AppCompatActivity {
                 );
                 lvVideo.setAdapter(adapter);
 
-                FloatingActionButton fabAddTrip = (FloatingActionButton) rootView.findViewById(R.id.fabVideo);
-                fabAddTrip.setOnClickListener(new View.OnClickListener() {
+                FloatingActionButton fabVideo = (FloatingActionButton) rootView.findViewById(R.id.fabVideo);
+                fabVideo.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         showCameraVideo();
+                    }
+                });
+
+                FloatingActionButton fabPhoto = (FloatingActionButton) rootView.findViewById(R.id.fabPhoto);
+                fabPhoto.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showCamera();
                     }
                 });
 
@@ -397,7 +405,7 @@ public class MainActivity extends AppCompatActivity {
                 Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath(),options);
                 System.out.println("####### handleSmallCameraPhoto ####### "+bitmap);
     //            imageTaken.setImageBitmap(bitmap); ===================>>>> se gan len map
-    //            new MyTask("image").execute(file); ===================>>>> upload to server
+                new UploadAsync(client, "image", BasicHelper.getMimeType(currentPath), getActivity()).execute(file);
             } catch (Exception e) {
                 e.printStackTrace();
             }
