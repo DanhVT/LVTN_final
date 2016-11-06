@@ -81,20 +81,20 @@ public class MainActivity extends AppCompatActivity {
         };
         for (int i = 0; i < tabLayout.getTabCount(); i++) {
             if(i != 0)
-                tabLayout.getTabAt(i).setIcon(icons[i]).getIcon().setColorFilter(parseColor("#9E9E9E"), PorterDuff.Mode.SRC_IN);
+                tabLayout.getTabAt(i).setIcon(icons[i]).getIcon().setColorFilter(parseColor("#004D40"), PorterDuff.Mode.SRC_IN);
             else
-                tabLayout.getTabAt(i).setIcon(icons[i]).getIcon().setColorFilter(parseColor("#595959"), PorterDuff.Mode.SRC_IN);
+                tabLayout.getTabAt(i).setIcon(icons[i]).getIcon().setColorFilter(parseColor("#FFFFFF"), PorterDuff.Mode.SRC_IN);
         }
 
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                tab.getIcon().setColorFilter(parseColor("#595959"), PorterDuff.Mode.SRC_IN);
+                tab.getIcon().setColorFilter(parseColor("#FFFFFF"), PorterDuff.Mode.SRC_IN);
             }
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
-                tab.getIcon().setColorFilter(parseColor("#9E9E9E"), PorterDuff.Mode.SRC_IN);
+                tab.getIcon().setColorFilter(parseColor("#004D40"), PorterDuff.Mode.SRC_IN);
             }
 
             @Override
