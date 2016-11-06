@@ -2,6 +2,7 @@ package cse.hcmut.edu.vn.tripmaster.ui.activity;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -10,12 +11,15 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.telephony.TelephonyManager;
@@ -38,8 +42,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import cse.hcmut.edu.vn.tripmaster.R;
+import cse.hcmut.edu.vn.tripmaster.TMApp;
 import cse.hcmut.edu.vn.tripmaster.helper.ApiCall;
 import cse.hcmut.edu.vn.tripmaster.helper.BasicHelper;
+import cse.hcmut.edu.vn.tripmaster.helper.LocationHelper;
 import cse.hcmut.edu.vn.tripmaster.service.http.HttpConstant;
 import cse.hcmut.edu.vn.tripmaster.service.http.RequestBuilder;
 import cse.hcmut.edu.vn.tripmaster.service.http.UploadAsync;
@@ -71,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
         setIconToTab(tabLayout);
-
+        initData();
     }
 
     private void setIconToTab(TabLayout tabLayout){
@@ -105,16 +111,12 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
@@ -123,6 +125,43 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void initData() {
+//        if (!LocationHelper.isGPSEnable()) {
+//            showSettingAlert();
+//        }
+        updateTrackingFab();
+    }
+
+    public void updateTrackingFab() {
+//        if (TMApp.getPref().getTracking()) {
+//            fabTrip.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_stop));
+//        } else {
+//            fabTrip.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_start));
+//        }
+    }
+
+    private void showSettingAlert() {
+        //TODO: convert to DialogHelper
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.gps_prompt_title)
+                .setMessage(R.string.gps_prompt_message)
+                .setPositiveButton(R.string.gps_prompt_accept_button
+                        , new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                                startActivityForResult(intent, 0);
+                            }
+                        })
+                .setNegativeButton(R.string.gps_prompt_decline_button
+                        , new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        })
+                .show();
     }
 
     public static class PlaceholderFragment extends Fragment {
@@ -306,33 +345,15 @@ public class MainActivity extends AppCompatActivity {
                 View rootView = inflater.inflate(R.layout.fragment_notify, container, false);
 //                TextView textView = (TextView) rootView.findViewById(R.id.section_label);
 //                textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
-                Button btnLogin= (Button) rootView.findViewById(R.id.btnLogin);
+                Button btnLogin = (Button) rootView.findViewById(R.id.btnLogin);
                 btnLogin.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        attemptLogin(HttpConstant.HOST_NAME+ "/api/login");
+                        startActivity(new Intent(getActivity(), LoginActivity.class));
                     }
                 });
                 return rootView;
             }
-        }
-
-        private void attemptLogin(String url) {
-            new AsyncTask<String, Void, Void>() {
-                @Override
-                protected Void doInBackground(String... params) {
-                    try {
-                        String response = ApiCall.POST(
-                                client,
-                                params[0],
-                                RequestBuilder.LoginBody("username", "password", "token"));
-                        Log.d("Response", response);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    return null;
-                }
-            }.execute(url);
         }
 
 
@@ -426,14 +447,11 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public Fragment getItem(int position) {
-            // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
             return PlaceholderFragment.newInstance(position + 1);
         }
 
         @Override
         public int getCount() {
-            // Show 4 total pages.
             return 4;
         }
 

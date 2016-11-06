@@ -59,10 +59,10 @@ public class UploadAsync extends AsyncTask<File,Void,String> {
         mProgress.dismiss();
         try {
 
-            JSONObject json= (JSONObject) new JSONTokener(result).nextValue();
-            JSONObject json2 = json.getJSONObject("results");
-            System.out.println("@######## Http onPostExecute##########  " + json2.getString("state"));
-            if(json2.getString("state").equals("success")){
+            JSONObject json= new JSONObject(result);
+
+            System.out.println("@######## Http onPostExecute##########  " + json.getString("state"));
+            if(json.getString("state").equals("success")){
                 showAlert(true, "Upload success");
             }
             else {

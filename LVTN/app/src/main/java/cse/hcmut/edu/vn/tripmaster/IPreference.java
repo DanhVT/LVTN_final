@@ -7,4 +7,10 @@ package cse.hcmut.edu.vn.tripmaster;
 public interface IPreference {
     void setTracking(boolean v);
     boolean getTracking();
+
+    void setToken(String v);
+    String getToken();
+
+    void setGravity(String v);
+    String getGravity();
 }

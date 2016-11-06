@@ -6,5 +6,7 @@ package cse.hcmut.edu.vn.tripmaster.service.http;
 
 public class HttpConstant {
     public static final String HOST_NAME = "http://trip-demo-danhbkit.c9users.io:8080/";
+    public static final String LOGIN_LINK = HOST_NAME + "api/login";
+    public static final String REGISTER_LINK = HOST_NAME + "api/register";
     public static final String UPLOAD_LINK = HOST_NAME + "api/upload";
 }
