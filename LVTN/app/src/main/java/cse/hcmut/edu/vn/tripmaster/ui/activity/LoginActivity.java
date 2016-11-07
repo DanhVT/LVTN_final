@@ -42,7 +42,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
+        checkUserHaveLogined();
         client = new OkHttpClient();
         txtEmail = (EditText) findViewById(R.id.input_email);
         txtPassword = (EditText) findViewById(R.id.input_password);
@@ -100,7 +100,43 @@ public class LoginActivity extends AppCompatActivity {
         String email = txtEmail.getText().toString();
         String password = txtPassword.getText().toString();
 
-        attemptLogin(HttpConstant.LOGIN_LINK, email, password);
+        new AsyncTask<String, Void, Void>() {
+            @Override
+            protected Void doInBackground(String... params) {
+                try {
+                    String response = ApiCall.POST(
+                            client,
+                            params[0],
+                            RequestBuilder.LoginBody(params[1], params[2]));
+                    JSONObject json = new JSONObject(response);
+
+                    if(json != null && json.getString("state").equals("success") ){
+                        String token = json.getString("_id");
+                        String grav = json.getString("grav");
+                        TMApp.getPref().setToken(token);
+                        TMApp.getPref().setGravity(grav);
+
+                        onLoginSuccess();
+                        progressDialog.dismiss();
+
+                        Intent gotoActivity = new Intent(LoginActivity.this,MainActivity.class);
+                        startActivity(gotoActivity);
+                    }
+                    else{
+
+                        onLoginFailed();
+                        progressDialog.dismiss();
+
+                    }
+                    Log.d("Response", response);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        }.execute(HttpConstant.LOGIN_LINK, email, password);
 
     }
 
@@ -112,36 +148,6 @@ public class LoginActivity extends AppCompatActivity {
     public void onLoginSuccess() {
         btnLogin.setEnabled(true);
         finish();
-    }
-
-    private void attemptLogin(String url, String _email, String _password ) {
-        new AsyncTask<String, Void, Void>() {
-            @Override
-            protected Void doInBackground(String... params) {
-                try {
-                    String response = ApiCall.POST(
-                            client,
-                            params[0],
-                            RequestBuilder.LoginBody(params[1], params[2]));
-                    JSONObject json = new JSONObject(response);
-                    if(json != null){
-                        String token = json.getString("_id");
-                        String grav = json.getString("grav");
-                        TMApp.getPref().setToken(token);
-                        TMApp.getPref().setGravity(grav);
-//                        progressDialog.dismiss();
-                        Intent gotoActivity = new Intent(LoginActivity.this,MainActivity.class);
-                        startActivity(gotoActivity);
-                    }
-                    Log.d("Response", response);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                return null;
-            }
-        }.execute(url, _email, _password);
     }
 
     public boolean validate() {
@@ -157,14 +163,21 @@ public class LoginActivity extends AppCompatActivity {
             txtEmail.setError(null);
         }
 
-        if (password.isEmpty() || password.length() < 4 || password.length() > 10) {
-            txtPassword.setError("between 4 and 10 alphanumeric characters");
+        if (password.isEmpty() || password.length() < 4) {
+            txtPassword.setError("Minimum 4 alphanumeric characters");
             valid = false;
         } else {
             txtPassword.setError(null);
         }
 
         return valid;
+    }
+    public void checkUserHaveLogined(){
+        if(TMApp.getPref().getToken() !="" &&  TMApp.getPref().getToken().length() > 0){
+            Intent profactivity = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(profactivity);
+        }
+
     }
 }
 

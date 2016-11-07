@@ -1,5 +1,6 @@
 package cse.hcmut.edu.vn.tripmaster;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 
 /**
@@ -13,6 +14,11 @@ public class TMPref implements IPreference {
     public static final String KEY_GRAVITY = "Gravity";
 
     private SharedPreferences mPref;
+
+    public TMPref(Context context, String name) {
+        mPref = context.getSharedPreferences(name, Context.MODE_PRIVATE);
+    }
+
 
     @Override
     public void setTracking(boolean v) {

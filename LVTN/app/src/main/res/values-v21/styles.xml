@@ -22,4 +22,9 @@
         <item name="colorButtonNormal">@color/colorDarker</item>
         <item name="android:colorButtonNormal">@color/colorDarker</item>
     </style>
+    <style name="AppTheme.Dark.Dialog" parent="Theme.AppCompat.Dialog">
+        <item name="colorAccent">@color/white</item>
+        <item name="android:textColorPrimary">@color/iron</item>
+        <item name="android:background">@color/colorPrimary</item>
+    </style>
 </resources>

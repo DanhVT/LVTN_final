@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="cse.hcmut.edu.vn.tripmaster">
+    package="cse.hcmut.edu.vn.tripmaster"
+    android:versionCode="2000000"
+    android:versionName="2.0.0-pro">
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -26,12 +28,13 @@
 
     <!--  -->
     <application
+        android:name=".TMApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.activity.MainActivity">
+        <activity android:name=".ui.activity.LoginActivity" android:theme="@style/AppTheme.Dark" android:label="@string/title_activity_login" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -64,14 +67,6 @@
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="59da65b734f591a9e856121b6650b98659408ce3" />
-        <!--
-             The API key for Google Maps-based APIs is defined as a string resource.
-             (See the file "res/values/google_maps_api.xml").
-             Note that the API key is linked to the encryption key used to sign the APK.
-             You need a different API key for each encryption key, including the release key that is used to
-             sign the APK for publishing.
-             You can define the keys for the debug and release targets in src/debug/ and src/release/. 
-        -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
@@ -84,10 +79,8 @@
             android:label="@string/title_activity_maps" />
         <activity android:name=".ui.activity.RowVideo" />
         <activity
-            android:name=".ui.activity.LoginActivity"
-            android:label="@string/title_activity_login"
-            android:theme="@style/AppTheme.Dark" />
-        <activity android:name=".ui.activity.SignupActivity"></activity>
+            android:name=".ui.activity.MainActivity"    />
+        <activity android:name=".ui.activity.SignupActivity" android:theme="@style/AppTheme.Dark"></activity>
     </application>
 
 </manifest>
