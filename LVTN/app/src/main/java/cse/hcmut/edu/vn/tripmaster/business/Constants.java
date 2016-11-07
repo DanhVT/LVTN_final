@@ -5,6 +5,7 @@ package cse.hcmut.edu.vn.tripmaster.business;
  */
 
 public class Constants {
+    public static final String PREFERENCES_NAME = "TMPref";
     //InternalConstants for location listener
     public static final long MIN_TIME_UPDATE_LOCATION = 1000 * 1 * 5; //2s
     public static final float MIN_DISTANCE_UPDATE_LOCATION = 5; //10m

@@ -1,17 +1,12 @@
 package cse.hcmut.edu.vn.tripmaster.helper;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Environment;
-import android.provider.MediaStore;
-import android.telephony.TelephonyManager;
+import android.webkit.MimeTypeMap;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -19,8 +14,14 @@ import java.util.Date;
  */
 
 public class BasicHelper {
-    private static TelephonyManager telephonyManager;
-
+    public static String getMimeType(String url) {
+        String type = null;
+        String extension = MimeTypeMap.getFileExtensionFromUrl(url);
+        if (extension != null) {
+            type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+        }
+        return type;
+    }
     public static String getBrand() {
         String brand;
         try {
@@ -67,7 +68,7 @@ public class BasicHelper {
                     root.mkdirs();
                 }
                 // Create an image file name
-                String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmm").format(new Date());
+                String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
                 String imageFileName = "Image_" + timeStamp + "_";
                 tempFile = File.createTempFile(imageFileName,".jpg",root);
             }
@@ -107,5 +108,10 @@ public class BasicHelper {
             e.printStackTrace();
         }
         return tempFile;
+    }
+    public  static String getCurrentTime() {
+        Calendar cal = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd_HHmmss");
+        return sdf.format(cal.getTime());
     }
 }

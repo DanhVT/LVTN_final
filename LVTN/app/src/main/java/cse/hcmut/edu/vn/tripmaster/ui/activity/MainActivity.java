@@ -1,21 +1,29 @@
 package cse.hcmut.edu.vn.tripmaster.ui.activity;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.PorterDuff;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -30,10 +38,16 @@ import android.widget.ImageView;
 import android.widget.ListView;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import cse.hcmut.edu.vn.tripmaster.R;
+import cse.hcmut.edu.vn.tripmaster.TMApp;
+import cse.hcmut.edu.vn.tripmaster.helper.ApiCall;
 import cse.hcmut.edu.vn.tripmaster.helper.BasicHelper;
+import cse.hcmut.edu.vn.tripmaster.helper.LocationHelper;
+import cse.hcmut.edu.vn.tripmaster.service.http.HttpConstant;
+import cse.hcmut.edu.vn.tripmaster.service.http.RequestBuilder;
 import cse.hcmut.edu.vn.tripmaster.service.http.UploadAsync;
 import cse.hcmut.edu.vn.tripmaster.ui.activity.Maps.MapsActivity;
 import cse.hcmut.edu.vn.tripmaster.ui.activity.Trips.ListAdapter_Trip;
@@ -53,7 +67,6 @@ public class MainActivity extends AppCompatActivity {
 
     private ViewPager mViewPager;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,7 +76,6 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         // TODO: Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
-
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // TODO: Set up the ViewPager with the sections adapter.
@@ -73,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
         setIconToTab(tabLayout);
-
+        initData();
     }
 
     private void setIconToTab(TabLayout tabLayout){
@@ -83,20 +95,23 @@ public class MainActivity extends AppCompatActivity {
         };
         for (int i = 0; i < tabLayout.getTabCount(); i++) {
             if(i != 0)
-                tabLayout.getTabAt(i).setIcon(icons[i]).getIcon().setColorFilter(parseColor("#999999"), PorterDuff.Mode.SRC_IN);
+
+                tabLayout.getTabAt(i).setIcon(icons[i]).getIcon().setColorFilter(parseColor("#004D40"), PorterDuff.Mode.SRC_IN);
             else
-                tabLayout.getTabAt(i).setIcon(icons[i]).getIcon().setColorFilter(parseColor("#008080"), PorterDuff.Mode.SRC_IN);
+                tabLayout.getTabAt(i).setIcon(icons[i]).getIcon().setColorFilter(parseColor("#FFFFFF"), PorterDuff.Mode.SRC_IN);
+
         }
 
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                tab.getIcon().setColorFilter(parseColor("#008080"), PorterDuff.Mode.SRC_IN);
-            }
+
+                tab.getIcon().setColorFilter(parseColor("#FFFFFF"), PorterDuff.Mode.SRC_IN);
+          }
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
-                tab.getIcon().setColorFilter(parseColor("#999999"), PorterDuff.Mode.SRC_IN);
+                tab.getIcon().setColorFilter(parseColor("#004D40"), PorterDuff.Mode.SRC_IN);
             }
 
             @Override
@@ -120,6 +135,43 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void initData() {
+//        if (!LocationHelper.isGPSEnable()) {
+//            showSettingAlert();
+//        }
+        updateTrackingFab();
+    }
+
+    public void updateTrackingFab() {
+//        if (TMApp.getPref().getTracking()) {
+//            fabTrip.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_stop));
+//        } else {
+//            fabTrip.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_start));
+//        }
+    }
+
+    private void showSettingAlert() {
+        //TODO: convert to DialogHelper
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.gps_prompt_title)
+                .setMessage(R.string.gps_prompt_message)
+                .setPositiveButton(R.string.gps_prompt_accept_button
+                        , new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                                startActivityForResult(intent, 0);
+                            }
+                        })
+                .setNegativeButton(R.string.gps_prompt_decline_button
+                        , new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        })
+                .show();
     }
 
     public static class PlaceholderFragment extends Fragment {
@@ -206,11 +258,19 @@ public class MainActivity extends AppCompatActivity {
                 );
                 lvVideo.setAdapter(adapter);
 
-                FloatingActionButton fabAddTrip = (FloatingActionButton) rootView.findViewById(R.id.fabVideo);
-                fabAddTrip.setOnClickListener(new View.OnClickListener() {
+                FloatingActionButton fabVideo = (FloatingActionButton) rootView.findViewById(R.id.fabVideo);
+                fabVideo.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         showCameraVideo();
+                    }
+                });
+
+                FloatingActionButton fabPhoto = (FloatingActionButton) rootView.findViewById(R.id.fabPhoto);
+                fabPhoto.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showCamera();
                     }
                 });
 
@@ -296,9 +356,17 @@ public class MainActivity extends AppCompatActivity {
                 View rootView = inflater.inflate(R.layout.fragment_notify, container, false);
 //                TextView textView = (TextView) rootView.findViewById(R.id.section_label);
 //                textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
+                Button btnLogin = (Button) rootView.findViewById(R.id.btnLogin);
+                btnLogin.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        startActivity(new Intent(getActivity(), LoginActivity.class));
+                    }
+                });
                 return rootView;
             }
         }
+
 
         private void Move(){
             FrameLayout.LayoutParams paramsTrai = (FrameLayout.LayoutParams) fabDuoi.getLayoutParams();
@@ -369,7 +437,7 @@ public class MainActivity extends AppCompatActivity {
                 Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath(),options);
                 System.out.println("####### handleSmallCameraPhoto ####### "+bitmap);
     //            imageTaken.setImageBitmap(bitmap); ===================>>>> se gan len map
-    //            new MyTask("image").execute(file); ===================>>>> upload to server
+                new UploadAsync(client, "image", BasicHelper.getMimeType(currentPath), getActivity()).execute(file);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -378,7 +446,7 @@ public class MainActivity extends AppCompatActivity {
         public void handleCameraVideo(String currentPath) {
             System.out.println("####### handleCameraVideo ####### "+currentPath);
             File file = new File (currentPath);
-            new UploadAsync(client, "video", getActivity()).execute(file);
+            new UploadAsync(client, "video", BasicHelper.getMimeType(currentPath), getActivity()).execute(file);
         }
     }
 
@@ -390,14 +458,11 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public Fragment getItem(int position) {
-            // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
             return PlaceholderFragment.newInstance(position + 1);
         }
 
         @Override
         public int getCount() {
-            // Show 4 total pages.
             return 4;
         }
 
