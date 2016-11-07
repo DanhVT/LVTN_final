@@ -1,4 +1,4 @@
-package cse.hcmut.edu.vn.tripmaster.ui.activity;
+package cse.hcmut.edu.vn.tripmaster.ui.activity.UserAttribute;
 
 import android.content.Context;
 import android.graphics.Color;

@@ -33,8 +33,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.activity.RowTrip" />
-        <activity android:name=".ui.activity.RowAttributeUser" />
+        <activity android:name=".ui.activity.Trips.RowTrip" />
+        <activity android:name=".ui.activity.UserAttribute.RowAttributeUser" />
         <activity android:name=".ui.activity.InformationUser" />
         <activity android:name=".ui.activity.VideoPlayer"></activity>
         <service
@@ -74,9 +74,9 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name=".ui.activity.MapsActivity"
+            android:name=".ui.activity.Maps.MapsActivity"
             android:label="@string/title_activity_maps"></activity>
-        <activity android:name=".ui.activity.RowVideo"></activity>
+        <activity android:name=".ui.activity.Videos.RowVideo"></activity>
     </application>
 
 </manifest>

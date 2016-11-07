@@ -9,8 +9,8 @@
     <!-- TODO: Update blank fragment layout -->
 
     <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="144dp"
+        android:layout_width="match_parent"
+        android:layout_height="145dp"
         app:srcCompat="@drawable/cover_user"
         android:id="@+id/imageViewCoverUser" />
 

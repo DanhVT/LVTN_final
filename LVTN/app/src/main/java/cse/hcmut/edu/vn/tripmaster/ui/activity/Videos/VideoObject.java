@@ -1,4 +1,4 @@
-package cse.hcmut.edu.vn.tripmaster.ui.activity;
+package cse.hcmut.edu.vn.tripmaster.ui.activity.Videos;
 
 /**
  * Created by HOANG DUNG on 11/3/2016.

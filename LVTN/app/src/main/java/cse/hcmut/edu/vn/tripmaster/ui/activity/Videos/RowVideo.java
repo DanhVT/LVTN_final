@@ -1,4 +1,4 @@
-package cse.hcmut.edu.vn.tripmaster.ui.activity;
+package cse.hcmut.edu.vn.tripmaster.ui.activity.Videos;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;

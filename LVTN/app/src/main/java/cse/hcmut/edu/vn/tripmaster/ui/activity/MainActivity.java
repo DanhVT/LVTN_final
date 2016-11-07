@@ -35,6 +35,14 @@ import java.util.ArrayList;
 import cse.hcmut.edu.vn.tripmaster.R;
 import cse.hcmut.edu.vn.tripmaster.helper.BasicHelper;
 import cse.hcmut.edu.vn.tripmaster.service.http.UploadAsync;
+import cse.hcmut.edu.vn.tripmaster.ui.activity.Maps.MapsActivity;
+import cse.hcmut.edu.vn.tripmaster.ui.activity.Trips.ListAdapter_Trip;
+import cse.hcmut.edu.vn.tripmaster.ui.activity.Trips.RowTrip;
+import cse.hcmut.edu.vn.tripmaster.ui.activity.Trips.Trip_Dung;
+import cse.hcmut.edu.vn.tripmaster.ui.activity.UserAttribute.AttributeUser;
+import cse.hcmut.edu.vn.tripmaster.ui.activity.UserAttribute.ListAdapterAttributeUser;
+import cse.hcmut.edu.vn.tripmaster.ui.activity.Videos.ListAdapterVideo;
+import cse.hcmut.edu.vn.tripmaster.ui.activity.Videos.VideoObject;
 import okhttp3.OkHttpClient;
 
 import static android.graphics.Color.parseColor;
@@ -75,20 +83,20 @@ public class MainActivity extends AppCompatActivity {
         };
         for (int i = 0; i < tabLayout.getTabCount(); i++) {
             if(i != 0)
-                tabLayout.getTabAt(i).setIcon(icons[i]).getIcon().setColorFilter(parseColor("#9E9E9E"), PorterDuff.Mode.SRC_IN);
+                tabLayout.getTabAt(i).setIcon(icons[i]).getIcon().setColorFilter(parseColor("#999999"), PorterDuff.Mode.SRC_IN);
             else
-                tabLayout.getTabAt(i).setIcon(icons[i]).getIcon().setColorFilter(parseColor("#595959"), PorterDuff.Mode.SRC_IN);
+                tabLayout.getTabAt(i).setIcon(icons[i]).getIcon().setColorFilter(parseColor("#008080"), PorterDuff.Mode.SRC_IN);
         }
 
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                tab.getIcon().setColorFilter(parseColor("#595959"), PorterDuff.Mode.SRC_IN);
+                tab.getIcon().setColorFilter(parseColor("#008080"), PorterDuff.Mode.SRC_IN);
             }
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
-                tab.getIcon().setColorFilter(parseColor("#9E9E9E"), PorterDuff.Mode.SRC_IN);
+                tab.getIcon().setColorFilter(parseColor("#999999"), PorterDuff.Mode.SRC_IN);
             }
 
             @Override
@@ -99,19 +107,14 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
@@ -274,13 +277,14 @@ public class MainActivity extends AppCompatActivity {
                 fabTren.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
+                        showCameraVideo();
                     }
                 });
                 fabDuoi.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
+                        Intent goTo_Map = new Intent(getActivity(), MapsActivity.class);
+                        startActivity(goTo_Map);
                     }
                 });
 

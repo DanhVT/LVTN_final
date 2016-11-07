@@ -1,15 +1,17 @@
-package cse.hcmut.edu.vn.tripmaster.ui.activity;
+package cse.hcmut.edu.vn.tripmaster.ui.activity.Maps;
 
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,15 +31,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cse.hcmut.edu.vn.tripmaster.R;
-import cse.hcmut.edu.vn.tripmaster.ui.activity.Maps.DirectionFinder;
-import cse.hcmut.edu.vn.tripmaster.ui.activity.Maps.DirectionFinderListener;
-import cse.hcmut.edu.vn.tripmaster.ui.activity.Maps.Route;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, DirectionFinderListener {
     private GoogleMap mMap;
     private Button btnFindPath;
     private EditText etOrigin;
     private EditText etDestination;
+
+    private LinearLayout llayoutFindPath;
+    private FloatingActionButton fabFindPath;
+    private boolean show_hide = false;
 
     private List<Marker> originMarkers = new ArrayList<>();
     private List<Marker> destinationMarkers = new ArrayList<>();
@@ -55,6 +58,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         btnFindPath = (Button) findViewById(R.id.btnFindPath);
         etOrigin = (EditText) findViewById(R.id.etOrigin);
         etDestination = (EditText) findViewById(R.id.etDestination);
+
+
+        llayoutFindPath = (LinearLayout) findViewById(R.id.llayoutFindPath);
+        fabFindPath = (FloatingActionButton) findViewById(R.id.fabFindPath);
+        llayoutFindPath.setVisibility(LinearLayout.GONE);
+        fabFindPath.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                show_hide = ! show_hide;
+                if(show_hide == false){
+                    llayoutFindPath.setVisibility(LinearLayout.GONE);
+                }else {
+                    llayoutFindPath.setVisibility(LinearLayout.VISIBLE);
+                }
+            }
+        });
+
 
         btnFindPath.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -89,12 +109,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
 
         // Add a marker in Sydney and move the camera
-        LatLng bigc = new LatLng(10.905909, 106.850256);
+        LatLng HCMUT = new LatLng(10.772854, 106.660018);
         mMap.addMarker(new MarkerOptions()
-                .position(bigc)
-                .title("BigC Supermarket")
+                .position(HCMUT)
+                .title("Hochiminh City University of Technology")
         );
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(bigc, 14));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(HCMUT, 14));
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
